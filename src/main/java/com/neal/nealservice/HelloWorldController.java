@@ -2,8 +2,10 @@ package com.neal.nealservice;
 
 import com.neal.nealcore.base.controller.BaseController;
 import com.neal.nealcore.base.resultmodel.internal.RpcResultModel;
+import com.neal.nealcore.common.RedisUtil;
 import com.neal.nealcore.exception.beans.impl.RpcExceptionDesc;
 import com.neal.nealcore.exception.impl.RpcException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,8 @@ import java.util.Map;
 
 @RestController
 public class HelloWorldController extends BaseController {
+    @Autowired
+    RedisUtil redisUtil;
 
     @RequestMapping("/hello")
     public String hello() {
@@ -61,7 +65,9 @@ public class HelloWorldController extends BaseController {
 
         list.add(mapA);
         list.add(mapB);
-        RpcResultModel result = new RpcResultModel(list,"success");
+
+        redisUtil.lSet("list",list);
+        RpcResultModel result = new RpcResultModel(redisUtil.lGet("list",0, -1),"success");
         return result.toString();
     }
 }
